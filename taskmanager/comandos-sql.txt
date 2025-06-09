@@ -1,0 +1,22 @@
+-- Arquivo destinado para criação e modificação dos Scripts --
+
+create database taskmanager;
+use taskmanager;
+
+-- Criação da tabela de prioridade --
+ Create table prioridade (
+                 `id` BINARY(16) NOT NULL,
+                `descricao` VARCHAR(255) NULL DEFAULT NULL,
+                `preferencia` ENUM('ALTA', 'BAIXA', 'MEDIA') NULL DEFAULT NULL,
+                PRIMARY KEY (`id`))
+
+-- Criação da tabela de tarefa --
+Create table tarefa (
+                 id` BIGINT NOT NULL AUTO_INCREMENT,
+                `descricao` VARCHAR(255) NULL DEFAULT NULL,
+                `realizado` BIT(1) NOT NULL,
+                `titulo` VARCHAR(255) NULL DEFAULT NULL,
+                `prioridades_id` BINARY(16) NULL DEFAULT NULL,
+                 PRIMARY KEY (`id`),
+                 FOREIGN KEY (`prioridades_id`)
+                 REFERENCES `taskmanager`.`prioridade` (`id`))

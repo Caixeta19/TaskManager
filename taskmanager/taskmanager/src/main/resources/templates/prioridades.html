@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Controle de Prioridades</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/ico" href="/images/taskmanager.ico">
+    <style>
+        body {
+            background-color: #fbf8ef;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .prioridade-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #DCD6C6	;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .prioridade-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .prioridade-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #343a40;
+            border-radius: 6px;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+        .prioridade-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .prioridade-actions {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .prioridade-item:hover .prioridade-actions {
+            opacity: 1;
+        }
+        .btn-prioridade {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            background-color: #6C5F47; /* marrom suave */
+            color: #fff;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-prioridade:hover {
+            background-color: #5A4E3B; /* tom mais escuro no hover */
+        }
+        .nivel-alta { background-color: #ffebee; color: #d32f2f; }
+        .nivel-media { background-color: #fff3e0; color: #ef6c00; }
+        .nivel-baixa { background-color: #e8f5e9; color: #388e3c; }
+
+        /* estilização imagem */
+        .background-image {
+            position: absolute;
+            right: 25px;
+            bottom: 25px;
+            width: 45%;
+            height: 45%;
+            background-image: url('/images/taskmanager.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right bottom;
+            opacity: 0.7;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="background-image"></div>
+
+<div class="container">
+    <div class="prioridade-container">
+        <div class="prioridade-header text-center">
+            <h3 class="mb-3">Prioridades</h3>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="total-prioridades">
+                    <span class="badge bg-success rounded-pill" th:text="'Total: ' + ${prioridades.size()} + ' prioridades'"></span>
+                </div>
+                <button class="btn btn-dark btn-prioridade" data-bs-toggle="modal" data-bs-target="#newPrioridadeModal">
+                    <i class="bi bi-plus"></i> Nova Prioridade
+                </button>
+            </div>
+        </div>
+
+        <div class="prioridade-list">
+            <div th:each="prioridade : ${prioridades}" class="prioridade-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="nivel-prioridade"
+                                  th:text="${prioridade.preferencia}">
+                            </span>
+                            <small class="text-muted" th:if="${prioridade.descricao != null}"
+                                   th:text="${prioridade.descricao}">
+                            </small>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="prioridade-actions d-flex gap-2">
+                        <form th:action="@{/prioridades/excluir}" method="post">
+                            <input type="hidden" name="id" th:value="${prioridade.id}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    -->
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(prioridades)}" class="text-center py-4">
+                <i class="bi bi-inbox" style="font-size: 2rem; color: #ddd;"></i>
+                <p class="text-muted mt-2">Nenhuma prioridade cadastrada</p>
+            </div>
+        </div>
+        <a class="btn btn-dark btn-gasto" th:href="@{/tarefas}">Minhas Tarefas</a>
+    </div>
+</div>
+
+<div class="modal fade" id="newPrioridadeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cadastrar Nova Prioridade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/prioridades}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nivel de prioridade*</label>
+                        <select class="form-select" name="preferencia" id="preferencia" required>
+                            <option th:each="tipo : ${T(com.example.taskmanager.model.Enum.NiveisPrioridade).values()}"
+                                    th:value="${tipo}"
+                                    th:text="${tipo}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <textarea class="form-control" name="descricao" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-dark">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

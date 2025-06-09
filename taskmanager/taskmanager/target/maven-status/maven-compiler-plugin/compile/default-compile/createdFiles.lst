@@ -1,0 +1,10 @@
+com\example\taskmanager\controller\PrioridadeController.class
+com\example\taskmanager\controller\TarefasController.class
+com\example\taskmanager\model\Tarefas.class
+com\example\taskmanager\model\Enum\NiveisPrioridade.class
+com\example\taskmanager\repository\PrioridadeRepository.class
+com\example\taskmanager\repository\TarefasRepository.class
+com\example\taskmanager\service\TarefasService.class
+com\example\taskmanager\Application.class
+com\example\taskmanager\model\Prioridade.class
+com\example\taskmanager\service\PrioridadeService.class

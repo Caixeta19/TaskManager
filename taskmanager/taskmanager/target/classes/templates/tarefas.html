@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gerenciamento de Tarefas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="icon" type="image/ico" href="/images/taskmanager.ico">
+  <style>
+    body {
+      background-color: #fbf8ef;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .tarefa-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background:#DCD6C6;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .tarefa-header {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .tarefa-item {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #343a40;
+      border-radius: 6px;
+      background: #fff;
+      transition: all 0.2s;
+    }
+    .tarefa-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .tarefa-actions {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .tarefa-item:hover .tarefa-actions {
+      opacity: 1;
+    }
+    .btn-tarefa {
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      background-color: #6C5F47; /* marrom suave */
+      color: #fff;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-tarefa:hover {
+      background-color: #5A4E3B; /* tom mais escuro no hover */
+    }
+
+    .status-tarefa {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .status-pendente { background-color: #fff3e0; color: #ef6c00; }
+    .status-concluido { background-color: #e8f5e9; color: #388e3c; }
+    .prioridade-tarefa {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+    .prioridade-alta { background-color: #ffebee; color: #d32f2f; }
+    .prioridade-media { background-color: #fff3e0; color: #ef6c00; }
+    .prioridade-baixa { background-color: #e8f5e9; color: #388e3c; }
+
+    /* estilização imagem */
+    .background-image {
+      position: absolute;
+      right: 25px;
+      bottom: 25px;
+      width: 45%;
+      height: 45%;
+      background-image: url('/images/taskmanager.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      opacity: 0.7;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="background-image"></div>
+<div class="container">
+  <div class="tarefa-container">
+    <div class="tarefa-header text-center">
+      <h3 class="mb-3">Minhas Tarefas</h3>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="total-tarefas">
+          <span class="badge bg-success rounded-pill" th:text="'Total: ' + ${tarefas.size()} + ' tarefas'"></span>
+        </div>
+        <button class="btn btn-dark btn-tarefa" data-bs-toggle="modal" data-bs-target="#newTarefaModal">
+          <i class="bi bi-plus"></i> Nova Tarefa
+        </button>
+      </div>
+    </div>
+
+    <div class="tarefa-list">
+      <div th:each="tarefa : ${tarefas}" class="tarefa-item">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <h5 th:text="${tarefa.titulo}">Título da Tarefa</h5>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="status-tarefa" th:classappend="${tarefa.realizado} ? 'status-concluido' : 'status-pendente'"
+                                  th:text="${tarefa.realizado} ? 'Concluído' : 'Pendente'">
+                                Status
+                            </span>
+              <span th:if="${tarefa.prioridade != null and tarefa.prioridade.preferencia != null}"
+                    class="prioridade-tarefa"
+                    th:classappend="'prioridade-' + ${#strings.toLowerCase(tarefa.prioridade.preferencia)}"
+                    th:text="${tarefa.prioridade.preferencia} + '-' + ${tarefa.prioridade.descricao}">
+    Prioridade
+</span>
+            </div>
+            <p class="text-muted mb-0" th:if="${tarefa.descricao != null}" th:text="${tarefa.descricao}"></p>
+          </div>
+          <div class="tarefa-actions d-flex gap-2">
+            <form th:action="@{/tarefas/status}" method="post">
+              <input type="hidden" name="id" th:value="${tarefa.id}">
+              <button type="submit" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-check"></i>
+              </button>
+            </form>
+              <!-- (metodo de exclusao)
+              <form th:action="@{/tarefas/excluir}" method="post">
+              <input type="hidden" name="id" th:value="${tarefa.id}">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+              -->
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${#lists.isEmpty(tarefas)}" class="text-center py-4">
+        <i class="bi bi-inbox" style="font-size: 2rem; color: #ddd;"></i>
+        <p class="text-muted mt-2">Nenhuma tarefa cadastrada</p>
+      </div>
+    </div>
+    <a class="btn btn-dark btn-gasto" th:href="@{/prioridades}">Prioridades</a>
+  </div>
+</div>
+
+<div class="modal fade" id="newTarefaModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cadastrar Nova Tarefa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form th:action="@{/tarefas}" method="post">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Título da Tarefa*</label>
+            <input type="text" class="form-control" name="titulo" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-control" name="descricao" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Prioridade</label>
+            <select class="form-select" name="prioridadeId">
+              <option th:each="prioridade: ${prioridades}"
+                      th:value="${prioridade.id}"
+                      th:text="${prioridade.preferencia}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-dark">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
