@@ -71,4 +71,4 @@ Essas imagens ilustram o funcionamento e o visual da aplicação.
 
 ## 🧑‍💻 Desenvolvido por
 
-- Guilherme Caixeta e equipe colaboradora.
+- Guilherme Caixeta
